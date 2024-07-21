@@ -1,62 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FFAIVideo Generator</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        label { display: block; margin-top: 10px; }
-        input, select { width: 100%; padding: 5px; margin-top: 5px; }
-        button { margin-top: 20px; padding: 10px; }
-        #progress, #result { margin-top: 20px; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>FFAIVideo Generator</h1>
-    <form id="videoForm">
-        <label for="provider">Provider:</label>
-        <select id="provider" required>
-            <option value="g4f">g4f</option>
-            <option value="openai">OpenAI</option>
-            <option value="moonshot">Moonshot</option>
-        </select>
-
-        <label for="termsNum">Number of Terms:</label>
-        <input type="number" id="termsNum" value="8" required>
-
-        <label for="subtitleMaxWidth">Subtitle Max Width:</label>
-        <input type="number" id="subtitleMaxWidth" value="9" required>
-
-        <label for="videoClipDuration">Video Clip Duration (seconds):</label>
-        <input type="number" id="videoClipDuration" value="12" required>
-
-        <label for="voiceName">Voice Name:</label>
-        <input type="text" id="voiceName" value="zh-CN-YunjianNeural" required>
-
-        <label for="bgMusic">Background Music Path:</label>
-        <input type="text" id="bgMusic" placeholder="Path to background music file">
-
-        <label for="output">Output Path:</label>
-        <input type="text" id="output" placeholder="Path to output directory" required>
-        <button type="button" id="selectOutput">Select Output Folder</button>
-
-        <label for="localVideos">Local Videos Folder:</label>
-        <input type="text" id="localVideos" placeholder="Path to local video clips folder">
-        <button type="button" id="selectLocalVideos">Select Local Videos Folder</button>
-
-        <label for="useLocalVideos">Use Local Videos:</label>
-        <input type="checkbox" id="useLocalVideos">
-
-        <label for="pexelsApiKey">Pexels API Key:</label>
-        <input type="text" id="pexelsApiKey" required>
-
-        <label for="videoScript">Video Script:</label>
-        <textarea id="videoScript" rows="5" required></textarea>
-
-        <button type="submit">Generate Video</button>
-    </form>
-
-    <div id="progress"></div>
-    <div id="result"></div>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8 text-indigo-600">FFAIVideo Generator</h1>
+        <form id="videoForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="provider">Provider:</label>
+                    <select id="provider" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="g4f">g4f</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="moonshot">Moonshot</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="termsNum">Number of Terms:</label>
+                    <input type="number" id="termsNum" value="8" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="subtitleMaxWidth">Subtitle Max Width:</label>
+                    <input type="number" id="subtitleMaxWidth" value="9" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="videoClipDuration">Video Clip Duration (seconds):</label>
+                    <input type="number" id="videoClipDuration" value="12" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="voiceName">Voice Name:</label>
+                    <input type="text" id="voiceName" value="zh-CN-YunjianNeural" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="bgMusic">Background Music:</label>
+                    <input type="file" id="bgMusic" accept=".mp3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="output">Output Path:</label>
+                    <div class="flex">
+                        <input type="text" id="output" placeholder="Path to output directory" class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <button type="button" id="selectOutput" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline">Select</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="localVideos">Local Videos Folder:</label>
+                    <div class="flex">
+                        <input type="text" id="localVideos" placeholder="Path to local video clips folder" class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <button type="button" id="selectLocalVideos" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline">Select</button>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="useLocalVideos" class="mr-2">
+                    <label class="text-gray-700 text-sm font-bold" for="useLocalVideos">Use Local Videos</label>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="pexelsApiKey">Pexels API Key:</label>
+                    <input type="text" id="pexelsApiKey" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="videoScript">Video Script:</label>
+                <textarea id="videoScript" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+            </div>
+            <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="videoAspect">Video Aspect Ratio:</label>
+                <select id="videoAspect" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="16:9">Landscape (16:9)</option>
+                    <option value="9:16">Portrait (9:16)</option>
+                    <option value="1:1">Square (1:1)</option>
+                </select>
+            </div>
+            <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="textColor">Text Color:</label>
+                <input type="color" id="textColor" value="#FFFFFF" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Generate Video</button>
+            </div>
+        </form>
+        <div id="progress" class="mb-4"></div>
+        <div id="result" class="mb-4"></div>
+    </div>
 
     <script>
         const { ipcRenderer } = require('electron');
@@ -81,7 +109,7 @@
                 subtitleMaxWidth: parseInt(document.getElementById('subtitleMaxWidth').value),
                 videoClipDuration: parseInt(document.getElementById('videoClipDuration').value),
                 voiceName: document.getElementById('voiceName').value,
-                bgMusic: document.getElementById('bgMusic').value,
+                bgMusic: document.getElementById('bgMusic').files[0]?.path,
                 output: document.getElementById('output').value,
                 pexels: {
                     apiKey: document.getElementById('pexelsApiKey').value,
@@ -89,20 +117,23 @@
                 videoScript: document.getElementById('videoScript').value,
                 localVideosPath: document.getElementById('localVideos').value,
                 useLocalVideos: document.getElementById('useLocalVideos').checked,
+                videoAspect: document.getElementById('videoAspect').value,
+                textColor: document.getElementById('textColor').value,
             };
             ipcRenderer.send('generate-video', config);
+            document.getElementById('progress').innerHTML = '<div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">Generating video... Please wait.</div>';
         });
 
         ipcRenderer.on('progress-update', (event, progress) => {
-            document.getElementById('progress').textContent = `Progress: ${progress}%`;
+            document.getElementById('progress').innerHTML = `<div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">Progress: ${progress}%</div>`;
         });
 
         ipcRenderer.on('video-generated', (event, videoPath) => {
-            document.getElementById('result').textContent = `Video generated: ${videoPath}`;
+            document.getElementById('result').innerHTML = `<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">Video generated: ${videoPath}</div>`;
         });
 
         ipcRenderer.on('generation-error', (event, errorMessage) => {
-            document.getElementById('result').textContent = `Error: ${errorMessage}`;
+            document.getElementById('result').innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">Error: ${errorMessage}</div>`;
         });
     </script>
 </body>
