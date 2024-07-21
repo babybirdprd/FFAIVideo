@@ -87,7 +87,7 @@ ipcMain.on('generate-preview', async (event, config: VideoConfig) => {
     });
     event.reply('preview-generated', previewPath);
   } catch (error) {
-    event.reply('preview-error', error.message);
+    event.reply('preview-error', error instanceof Error ? error.message : 'An unknown error occurred');
   }
 });
 
