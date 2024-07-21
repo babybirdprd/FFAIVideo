@@ -32,7 +32,7 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('generate-video', (event, config: VideoConfig) => {
-  generateVideo(config, (progress) => {
+  generateVideo(config, (progress: number) => {
     event.reply('progress-update', progress);
   }).then((videoPath) => {
     event.reply('video-generated', videoPath);
