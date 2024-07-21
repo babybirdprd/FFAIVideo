@@ -10,7 +10,7 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-4xl font-bold text-center mb-8 text-indigo-600">FFAIVideo Generator</h1>
         <form id="videoForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="provider">Provider:</label>
                     <select id="provider" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
@@ -145,30 +145,29 @@
 
         ipcRenderer.on('selected-directory', (event, type, path) => {
             document.getElementById(type).value = path;
+            if (type === 'localVideos') {
+                loadLocalVideos(path);
+            }
+        });
+
+        function loadLocalVideos(path) {
+            ipcRenderer.send('load-local-videos', path);
+        }
+
+        ipcRenderer.on('local-videos-loaded', (event, videos) => {
+            const selector = document.getElementById('localVideoSelector');
+            selector.innerHTML = '';
+            videos.forEach(video => {
+                const option = document.createElement('option');
+                option.value = video;
+                option.textContent = video.split('/').pop();
+                selector.appendChild(option);
+            });
         });
 
         document.getElementById('videoForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const config = {
-                provider: document.getElementById('provider').value,
-                termsNum: parseInt(document.getElementById('termsNum').value),
-                subtitleMaxWidth: parseInt(document.getElementById('subtitleMaxWidth').value),
-                videoClipDuration: parseInt(document.getElementById('videoClipDuration').value),
-                voiceName: document.getElementById('voiceName').value,
-                bgMusic: Array.from(document.getElementById('bgMusic').files).map(file => file.path),
-                output: document.getElementById('output').value,
-                pexels: {
-                    apiKey: document.getElementById('pexelsApiKey').value,
-                },
-                videoScript: document.getElementById('videoScript').value,
-                localVideosPath: document.getElementById('localVideos').value,
-                useLocalVideos: document.getElementById('useLocalVideos').checked,
-                videoAspect: document.getElementById('videoAspect').value,
-                textColor: document.getElementById('textColor').value,
-                customFont: document.getElementById('customFont').files[0]?.path,
-                transitionEffect: document.getElementById('transitionEffect').value,
-                videoTheme: document.getElementById('videoTheme').value,
-            };
+            const config = getFormConfig();
             ipcRenderer.send('generate-video', config);
             document.getElementById('progress').innerHTML = '<div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">Generating video... Please wait.</div>';
         });
@@ -178,7 +177,14 @@
         });
 
         ipcRenderer.on('video-generated', (event, videoPath) => {
-            document.getElementById('result').innerHTML = `<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">Video generated: ${videoPath}</div>`;
+            document.getElementById('result').innerHTML = `
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+                    Video generated: ${videoPath}
+                    <video controls width="320" height="240" class="mt-2">
+                        <source src="${videoPath}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>`;
         });
 
         ipcRenderer.on('generation-error', (event, errorMessage) => {
@@ -186,17 +192,7 @@
         });
 
         document.getElementById('savePreset').addEventListener('click', () => {
-            const config = {
-                provider: document.getElementById('provider').value,
-                termsNum: parseInt(document.getElementById('termsNum').value),
-                subtitleMaxWidth: parseInt(document.getElementById('subtitleMaxWidth').value),
-                videoClipDuration: parseInt(document.getElementById('videoClipDuration').value),
-                voiceName: document.getElementById('voiceName').value,
-                videoAspect: document.getElementById('videoAspect').value,
-                textColor: document.getElementById('textColor').value,
-                transitionEffect: document.getElementById('transitionEffect').value,
-                videoTheme: document.getElementById('videoTheme').value,
-            };
+            const config = getFormConfig();
             ipcRenderer.send('save-preset', config);
         });
 
@@ -208,7 +204,11 @@
             Object.keys(preset).forEach(key => {
                 const element = document.getElementById(key);
                 if (element) {
-                    element.value = preset[key];
+                    if (element.type === 'checkbox') {
+                        element.checked = preset[key];
+                    } else {
+                        element.value = preset[key];
+                    }
                 }
             });
         });
@@ -257,8 +257,10 @@
                 videoScript: document.getElementById('videoScript').value,
                 localVideosPath: document.getElementById('localVideos').value,
                 useLocalVideos: document.getElementById('useLocalVideos').checked,
+                selectedLocalVideos: Array.from(document.getElementById('localVideoSelector').selectedOptions).map(option => option.value),
                 videoAspect: document.getElementById('videoAspect').value,
                 textColor: document.getElementById('textColor').value,
+                backgroundColor: document.getElementById('backgroundColor').value,
                 customFont: document.getElementById('customFont').files[0]?.path,
                 transitionEffect: document.getElementById('transitionEffect').value,
                 videoTheme: document.getElementById('videoTheme').value,
