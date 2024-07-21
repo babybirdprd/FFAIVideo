@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import path from 'path';
 import { clone } from 'lodash';
 import { MsEdgeTTS } from 'edge-tts-node';
 import { VoiceConfig } from './config/voice-config';
@@ -145,6 +146,9 @@ const generateSubtitle = async (
       }
     }
 
+    // Ensure the directory exists
+    await fs.ensureDir(path.dirname(subtitleFile));
+
     if (subItems.length > 2) {
       await fs.writeFile(subtitleFile, subItems.join('\n') + '\n', {
         encoding: 'utf-8',
@@ -153,7 +157,8 @@ const generateSubtitle = async (
       Logger.log(
         `Sorry, getMatchLineStr no vocabulary matched. ${subItems.length}`,
       );
-      return;
+      // Create an empty subtitle file
+      await fs.writeFile(subtitleFile, '', { encoding: 'utf-8' });
     }
 
     if (subItems.length !== cscriptLines.length) {
@@ -163,6 +168,8 @@ const generateSubtitle = async (
     }
   } catch (e) {
     Logger.error(`failed, error: ${e}`);
+    // Create an empty subtitle file in case of error
+    await fs.writeFile(subtitleFile, '', { encoding: 'utf-8' });
   }
 };
 
