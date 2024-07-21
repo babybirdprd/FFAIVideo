@@ -46,16 +46,25 @@ const combineFinalVideo = async (
     command = command.addInput(file);
   });
   command.input(audioFile);
-  command.input(bgMusic);
+  if (bgMusic) {
+    command.input(bgMusic);
+  }
   command.input(subtitleFile);
 
   const filters = [
     `${vfilter}concat=n=${clips.length}:v=1:a=0[v]`,
     `[${clips.length}:a]volume=${voiceVolume}[audio]`,
-    `[${clips.length + 1}:a]volume=${bgMusicVolume}[bg]`,
-    `[audio][bg]amix=inputs=2[a]`,
-    `[v]subtitles=${subtitleFile}[v]`,
   ];
+  
+  if (bgMusic) {
+    filters.push(`[${clips.length + 1}:a]volume=${bgMusicVolume}[bg]`);
+    filters.push(`[audio][bg]amix=inputs=2[a]`);
+  } else {
+    filters.push(`[audio]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo[a]`);
+  }
+  
+  filters.push(`[v]subtitles=${subtitleFile}[v]`);
+
   if (fontsDir || fontName) {
     const str = convertFiltersToString({
       fontsdir: fontsDir,
@@ -76,7 +85,7 @@ const combineFinalVideo = async (
     '-map',
     '[v]',
     '-map',
-    `[a]`,
+    '[a]',
     '-c:v',
     'libx264',
     '-c:a',

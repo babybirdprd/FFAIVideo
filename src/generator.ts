@@ -36,14 +36,12 @@ const generateVideo = async (
   // AI generates Terms based on text content.
   if (!videoTerms) {
     videoTerms = await generateTerms(videoScript.trim(), config);
+  } else if (typeof videoTerms === 'string') {
+    videoTerms = videoTerms.split(/[,，]/).map(term => term.trim());
+  } else if (Array.isArray(videoTerms)) {
+    videoTerms = videoTerms.map(term => term.trim());
   } else {
-    if (typeof videoTerms === 'string') {
-      videoTerms = videoTerms.split(/[,，]/).map(term => term.trim());
-    } else if (Array.isArray(videoTerms)) {
-      videoTerms = videoTerms.map(term => term.trim());
-    } else {
-      throw new Error('video_terms must be a string or an array of strings');
-    }
+    throw new Error('video_terms must be a string or an array of strings');
   }
   Logger.log(`video_terms: ${videoTerms}`);
 

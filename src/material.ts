@@ -103,7 +103,6 @@ const downloadVideos = async (
   const { videoClipDuration: maxClipDuration = 5, useLocalVideos, localVideosPath } = config;
   let validVideoItems: MaterialInfo[] = [];
   const validVideoUrls: string[] = [];
-  let foundDuration = 0.0;
   const videoPaths: string[] = [];
 
   if (useLocalVideos && localVideosPath) {
@@ -116,33 +115,26 @@ const downloadVideos = async (
   if (!useLocalVideos || videoPaths.length === 0) {
     for (const searchTerm of searchTerms) {
       const videoItems = await searchVideos(searchTerm, maxClipDuration, config);
-
-      for (const item of videoItems) {
-        if (!validVideoUrls.includes(item.url)) {
-          validVideoItems.push(item);
-          validVideoUrls.push(item.url);
-          foundDuration += item.duration;
-        }
-      }
+      validVideoItems.push(...videoItems.filter(item => !validVideoUrls.includes(item.url)));
+      validVideoUrls.push(...videoItems.map(item => item.url));
     }
 
     let totalDuration = 0.0;
-    let index = 0;
-    for (const item of validVideoItems) {
+    for (let i = 0; i < validVideoItems.length; i++) {
       try {
-        index++;
+        const item = validVideoItems[i];
         const savedVideoPath = await saveVideo(item.url, cacheDir, config);
-        progress(40 + Math.floor((index * 45) / validVideoItems.length));
+        progress(40 + Math.floor((i + 1) * 45 / validVideoItems.length));
         if (savedVideoPath) {
           videoPaths.push(savedVideoPath);
           const seconds = Math.min(maxClipDuration, item.duration);
           totalDuration += seconds;
-          if (totalDuration > videoDuration) {
+          if (totalDuration >= videoDuration) {
             break;
           }
         }
       } catch (e) {
-        Logger.error(`failed to download video: ${toJson(item)} => ${e}`);
+        Logger.error(`Failed to download video: ${toJson(validVideoItems[i])} => ${e}`);
       }
     }
   }
