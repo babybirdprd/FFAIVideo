@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import md5 from 'md5';
+import path from 'path';
 import { VideoAspect } from './config/constant';
 import { VideoConfig } from './config/config';
 import { toResolution } from './utils/video-aspect';
