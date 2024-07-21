@@ -60,7 +60,7 @@ const getLLMConfig = (config: VideoConfig): LLMConfig => {
   return llmConfig;
 };
 
-const generateResponse = async (
+export const generateResponse = async (
   prompt: string,
   config: VideoConfig,
 ): Promise<string> => {
