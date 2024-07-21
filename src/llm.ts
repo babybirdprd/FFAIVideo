@@ -152,7 +152,7 @@ export const generateResponse = async (
   Logger.log(provider, JSON.stringify(llmConfig));
   const client = new OpenAI({
     apiKey: llmConfig.apiKey,
-    baseURL: llmConfig.baseUrl,
+    baseURL: llmConfig.baseUrl || undefined,
   });
   const response = await client.chat.completions.create({
     model: llmConfig.modelName,
