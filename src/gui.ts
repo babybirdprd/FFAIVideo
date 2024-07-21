@@ -5,8 +5,8 @@ import { generateVideo, VideoConfig, VideoAspect } from './index';
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 800,
+    width: 1200,
+    height: 900,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -44,6 +44,18 @@ ipcMain.on('select-directory', (event, type) => {
   });
 });
 
+ipcMain.on('load-local-videos', (event, dirPath) => {
+  fs.readdir(dirPath, (err, files) => {
+    if (err) {
+      console.error('Error reading directory:', err);
+      return;
+    }
+    const videoFiles = files.filter(file => file.endsWith('.mp4') || file.endsWith('.mov'));
+    const fullPaths = videoFiles.map(file => path.join(dirPath, file));
+    event.reply('local-videos-loaded', fullPaths);
+  });
+});
+
 ipcMain.on('generate-video', (event, config: VideoConfig) => {
   generateVideo(config, (progress: number) => {
     event.reply('progress-update', progress);
@@ -60,7 +72,7 @@ ipcMain.on('save-preset', (event, preset) => {
     filters: [{ name: 'JSON', extensions: ['json'] }]
   }).then(result => {
     if (!result.canceled && result.filePath) {
-      fs.writeFileSync(result.filePath, JSON.stringify(preset));
+      fs.writeFileSync(result.filePath, JSON.stringify(preset, null, 2));
       event.reply('preset-saved');
     }
   });
