@@ -66,6 +66,16 @@ ipcMain.on('generate-video', (event, config: VideoConfig) => {
   });
 });
 
+ipcMain.on('generate-script', async (event, { topic, config }) => {
+  try {
+    const prompt = `Generate a short video script about the following topic: ${topic}. The script should be concise and suitable for a short video.`;
+    const script = await generateResponse(prompt, config);
+    event.reply('script-generated', script);
+  } catch (error) {
+    event.reply('script-error', error.message);
+  }
+});
+
 ipcMain.on('save-preset', (event, preset) => {
   dialog.showSaveDialog({
     title: 'Save Preset',
