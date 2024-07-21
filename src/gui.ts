@@ -52,3 +52,33 @@ ipcMain.on('generate-video', (event, config: VideoConfig) => {
     event.reply('generation-error', error.message);
   });
 });
+
+ipcMain.on('save-preset', (event, preset) => {
+  dialog.showSaveDialog({
+    title: 'Save Preset',
+    filters: [{ name: 'JSON', extensions: ['json'] }]
+  }).then(result => {
+    if (!result.canceled && result.filePath) {
+      fs.writeFileSync(result.filePath, JSON.stringify(preset));
+      event.reply('preset-saved');
+    }
+  });
+});
+
+ipcMain.on('load-preset', (event) => {
+  dialog.showOpenDialog({
+    title: 'Load Preset',
+    filters: [{ name: 'JSON', extensions: ['json'] }]
+  }).then(result => {
+    if (!result.canceled && result.filePaths.length > 0) {
+      const preset = JSON.parse(fs.readFileSync(result.filePaths[0], 'utf-8'));
+      event.reply('preset-loaded', preset);
+    }
+  });
+});
+
+ipcMain.on('generate-preview', (event, config: VideoConfig) => {
+  // Implement preview generation logic here
+  // For now, we'll just send a placeholder message
+  event.reply('preview-generated', 'Preview generation not implemented yet');
+});
