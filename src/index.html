@@ -95,6 +95,14 @@
                 <input type="color" id="textColor" value="#FFFFFF" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="backgroundColor">Subtitle Background Color:</label>
+                <input type="color" id="backgroundColor" value="#000000" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="localVideoSelector">Select Local Video Clips:</label>
+                <select id="localVideoSelector" multiple class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"></select>
+            </div>
+            <div class="mt-4">
                 <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Generate Video</button>
             </div>
         </form>
@@ -102,9 +110,10 @@
         <div id="progress" class="mb-4"></div>
         <div id="result" class="mb-4"></div>
     </div>
-    <div class="fixed bottom-4 right-4">
+    <div class="fixed bottom-4 right-4 flex">
         <button id="savePreset" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">Save Preset</button>
-        <button id="loadPreset" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Load Preset</button>
+        <button id="loadPreset" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">Load Preset</button>
+        <button id="generatePreview" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Preview</button>
     </div>
 
     <script>
