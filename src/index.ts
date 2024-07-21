@@ -5,6 +5,7 @@ import { LLMConfig, defaultLLMConfig } from './config/llm-config';
 import { VoiceConfig } from './config/voice-config';
 import { SubMaker } from './sub-maker';
 import { Logger } from './utils/log';
+import { generateResponse } from './llm';
 
 export {
   generateVideo,
@@ -16,4 +17,5 @@ export {
   defaultLLMConfig,
   SubMaker,
   Logger,
+  generateResponse,
 };

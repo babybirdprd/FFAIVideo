@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import { generateVideo, VideoConfig, VideoAspect } from './index';
+import { generateVideo, VideoConfig, VideoAspect, generateResponse } from './index';
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -72,7 +72,7 @@ ipcMain.on('generate-script', async (event, { topic, config }) => {
     const script = await generateResponse(prompt, config);
     event.reply('script-generated', script);
   } catch (error) {
-    event.reply('script-error', error.message);
+    event.reply('script-error', error instanceof Error ? error.message : 'An unknown error occurred');
   }
 });
 
