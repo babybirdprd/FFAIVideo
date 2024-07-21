@@ -1,11 +1,11 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import { generateVideo, VideoConfig } from './index';
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 800,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -29,6 +29,18 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+ipcMain.on('select-directory', (event, type) => {
+  dialog.showOpenDialog({
+    properties: ['openDirectory']
+  }).then(result => {
+    if (!result.canceled) {
+      event.reply('selected-directory', type, result.filePaths[0]);
+    }
+  }).catch(err => {
+    console.log(err);
+  });
 });
 
 ipcMain.on('generate-video', (event, config: VideoConfig) => {

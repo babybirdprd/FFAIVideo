@@ -37,6 +37,14 @@
 
         <label for="output">Output Path:</label>
         <input type="text" id="output" placeholder="Path to output directory" required>
+        <button type="button" id="selectOutput">Select Output Folder</button>
+
+        <label for="localVideos">Local Videos Folder:</label>
+        <input type="text" id="localVideos" placeholder="Path to local video clips folder">
+        <button type="button" id="selectLocalVideos">Select Local Videos Folder</button>
+
+        <label for="useLocalVideos">Use Local Videos:</label>
+        <input type="checkbox" id="useLocalVideos">
 
         <label for="pexelsApiKey">Pexels API Key:</label>
         <input type="text" id="pexelsApiKey" required>
@@ -53,6 +61,18 @@
     <script>
         const { ipcRenderer } = require('electron');
 
+        document.getElementById('selectOutput').addEventListener('click', () => {
+            ipcRenderer.send('select-directory', 'output');
+        });
+
+        document.getElementById('selectLocalVideos').addEventListener('click', () => {
+            ipcRenderer.send('select-directory', 'localVideos');
+        });
+
+        ipcRenderer.on('selected-directory', (event, type, path) => {
+            document.getElementById(type).value = path;
+        });
+
         document.getElementById('videoForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const config = {
@@ -67,6 +87,8 @@
                     apiKey: document.getElementById('pexelsApiKey').value,
                 },
                 videoScript: document.getElementById('videoScript').value,
+                localVideosPath: document.getElementById('localVideos').value,
+                useLocalVideos: document.getElementById('useLocalVideos').checked,
             };
             ipcRenderer.send('generate-video', config);
         });
