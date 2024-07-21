@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import { generateVideo, VideoConfig } from './index';
+import { generateVideo, VideoConfig, VideoAspect } from './index';
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -78,8 +78,25 @@ ipcMain.on('load-preset', (event) => {
   });
 });
 
-ipcMain.on('generate-preview', (event, config: VideoConfig) => {
-  // Implement preview generation logic here
-  // For now, we'll just send a placeholder message
-  event.reply('preview-generated', 'Preview generation not implemented yet');
+ipcMain.on('generate-preview', async (event, config: VideoConfig) => {
+  try {
+    // Generate a short preview (e.g., 5 seconds)
+    const previewConfig = { ...config, videoClipDuration: 5 };
+    const previewPath = await generateVideo(previewConfig, (progress: number) => {
+      event.reply('preview-progress', progress);
+    });
+    event.reply('preview-generated', previewPath);
+  } catch (error) {
+    event.reply('preview-error', error.message);
+  }
+});
+
+ipcMain.on('get-video-aspects', (event) => {
+  event.reply('video-aspects', Object.values(VideoAspect));
+});
+
+ipcMain.on('get-voice-names', (event) => {
+  // This should be implemented to return available voice names
+  // For now, we'll return a placeholder array
+  event.reply('voice-names', ['en-US-JennyNeural', 'en-US-GuyNeural', 'zh-CN-XiaoxiaoNeural']);
 });

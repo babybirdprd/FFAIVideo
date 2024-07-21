@@ -110,6 +110,31 @@
     <script>
         const { ipcRenderer } = require('electron');
 
+        document.addEventListener('DOMContentLoaded', () => {
+            ipcRenderer.send('get-video-aspects');
+            ipcRenderer.send('get-voice-names');
+        });
+
+        ipcRenderer.on('video-aspects', (event, aspects) => {
+            const select = document.getElementById('videoAspect');
+            aspects.forEach(aspect => {
+                const option = document.createElement('option');
+                option.value = aspect;
+                option.textContent = aspect;
+                select.appendChild(option);
+            });
+        });
+
+        ipcRenderer.on('voice-names', (event, voices) => {
+            const select = document.getElementById('voiceName');
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice;
+                option.textContent = voice;
+                select.appendChild(option);
+            });
+        });
+
         document.getElementById('selectOutput').addEventListener('click', () => {
             ipcRenderer.send('select-directory', 'output');
         });
@@ -192,21 +217,53 @@
             alert('Preset saved successfully!');
         });
 
-        // Add a button to trigger preview generation
-        const previewButton = document.createElement('button');
-        previewButton.textContent = 'Generate Preview';
-        previewButton.className = 'bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4';
-        previewButton.addEventListener('click', () => {
-            const config = {
-                // ... (same as in the submit event listener)
-            };
+        document.getElementById('generatePreview').addEventListener('click', () => {
+            const config = getFormConfig();
             ipcRenderer.send('generate-preview', config);
+            document.getElementById('preview').innerHTML = '<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">Generating preview... Please wait.</div>';
         });
-        document.getElementById('videoForm').appendChild(previewButton);
 
-        ipcRenderer.on('preview-generated', (event, previewData) => {
-            document.getElementById('preview').innerHTML = `<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">${previewData}</div>`;
+        ipcRenderer.on('preview-progress', (event, progress) => {
+            document.getElementById('preview').innerHTML = `<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">Preview progress: ${progress}%</div>`;
         });
+
+        ipcRenderer.on('preview-generated', (event, previewPath) => {
+            document.getElementById('preview').innerHTML = `
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+                    Preview generated: ${previewPath}
+                    <video controls width="320" height="240" class="mt-2">
+                        <source src="${previewPath}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>`;
+        });
+
+        ipcRenderer.on('preview-error', (event, errorMessage) => {
+            document.getElementById('preview').innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">Preview error: ${errorMessage}</div>`;
+        });
+
+        function getFormConfig() {
+            return {
+                provider: document.getElementById('provider').value,
+                termsNum: parseInt(document.getElementById('termsNum').value),
+                subtitleMaxWidth: parseInt(document.getElementById('subtitleMaxWidth').value),
+                videoClipDuration: parseInt(document.getElementById('videoClipDuration').value),
+                voiceName: document.getElementById('voiceName').value,
+                bgMusic: Array.from(document.getElementById('bgMusic').files).map(file => file.path),
+                output: document.getElementById('output').value,
+                pexels: {
+                    apiKey: document.getElementById('pexelsApiKey').value,
+                },
+                videoScript: document.getElementById('videoScript').value,
+                localVideosPath: document.getElementById('localVideos').value,
+                useLocalVideos: document.getElementById('useLocalVideos').checked,
+                videoAspect: document.getElementById('videoAspect').value,
+                textColor: document.getElementById('textColor').value,
+                customFont: document.getElementById('customFont').files[0]?.path,
+                transitionEffect: document.getElementById('transitionEffect').value,
+                videoTheme: document.getElementById('videoTheme').value,
+            };
+        }
     </script>
 </body>
 </html>
