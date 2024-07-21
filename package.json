@@ -22,7 +22,7 @@
     "lint": "eslint -p tsconfig.json -c tslint.json",
     "typecheck": "eslint --ext .ts --ext .js src",
     "build": "rimraf dist && tsc -p tsconfig.build.json && npm run copy-html",
-    "copy-html": "cpy src/index.html dist/",
+    "copy-html": "node -e \"require('fs').copyFileSync('src/index.html', 'dist/index.html')\"",
     "test": "NODE_ENV=test jest",
     "clean": "rimraf ./examples/output",
     "example": "npm run clean && npm run build && node ./examples/simple",
